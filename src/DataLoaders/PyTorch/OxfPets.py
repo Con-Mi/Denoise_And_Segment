@@ -54,8 +54,8 @@ class PetsDataValid(Dataset):
         :param transform:
         """
         self._data_root: Path = Path("data")
-        self._input_img: list = sorted(self._data_root.glob("**/*.jpg"))[110:130]
-        self._target_img: list = sorted(self._data_root.glob("**/*.png"))[110:130]
+        self._input_img: list = sorted(self._data_root.glob("**/*.jpg"))
+        self._target_img: list = sorted(self._data_root.glob("**/*.png"))
         self._transform = transform
 
     def __len__(self):
