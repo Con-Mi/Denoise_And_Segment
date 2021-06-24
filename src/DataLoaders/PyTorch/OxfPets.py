@@ -14,8 +14,8 @@ class PetsData(Dataset):
         :param transform:
         """
         self._data_root: Path = Path("data")
-        self._input_img: list = sorted(self._data_root.glob("**/*.jpg"))[:100]
-        self._target_img: list = sorted(self._data_root.glob("**/*.png"))[:100]
+        self._input_img: list = sorted(self._data_root.glob("**/*.jpg"))
+        self._target_img: list = sorted(self._data_root.glob("**/*.png"))
         self._transform = transform
 
     def __len__(self):
@@ -34,10 +34,16 @@ class PetsData(Dataset):
         outpt_img_str: str = outpt_img_path.as_posix()
 
         inpt_img = sk_io.imread(inpt_img_str)
-        if inpt_img.shape[2] == 4:
-            inpt_img = sk_color.rgba2rgb(inpt_img)
-        inpt_noisy_img = sk_util.random_noise(inpt_img)
-        target_img = sk_io.imread(outpt_img_str)
+        print(inpt_img.shape)
+        if len(inpt_img.shape) > 2:
+            if inpt_img.shape[2] == 4:
+                inpt_img = sk_color.rgba2rgb(inpt_img)
+            inpt_noisy_img = sk_util.random_noise(inpt_img)
+            target_img = sk_io.imread(outpt_img_str)
+        else:
+            inpt_img = sk_color.gray2rgb(inpt_img)
+            inpt_noisy_img = sk_util.random_noise(inpt_img)
+            target_img = sk_io.imread(outpt_img_str)
 
         if self._transform is not None:
             inpt_img = self._transform(inpt_img)
@@ -54,8 +60,8 @@ class PetsDataValid(Dataset):
         :param transform:
         """
         self._data_root: Path = Path("data")
-        self._input_img: list = sorted(self._data_root.glob("**/*.jpg"))
-        self._target_img: list = sorted(self._data_root.glob("**/*.png"))
+        self._input_img: list = sorted(self._data_root.glob("**/*.jpg"))[:100]
+        self._target_img: list = sorted(self._data_root.glob("**/*.png"))[:100]
         self._transform = transform
 
     def __len__(self):
@@ -121,7 +127,10 @@ for item in ds:
     noise_inpt = noisy_img
     segm = segm_img
     to_plot = inpt_img
+    if len(inpt_img.shape) != 3:
+        break
 
-plt.imshow(to_plot.squeeze())
-plt.show()
+
+#plt.imshow(to_plot.squeeze())
+#plt.show()
 """
