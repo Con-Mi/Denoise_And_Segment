@@ -34,7 +34,6 @@ class PetsData(Dataset):
         outpt_img_str: str = outpt_img_path.as_posix()
 
         inpt_img = sk_io.imread(inpt_img_str)
-        print(inpt_img.shape)
         if len(inpt_img.shape) > 2:
             if inpt_img.shape[2] == 4:
                 inpt_img = sk_color.rgba2rgb(inpt_img)
