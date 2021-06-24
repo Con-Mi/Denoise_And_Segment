@@ -35,8 +35,10 @@ SegmModel.to(device=DEVICE)
 
 MUL_TRANFORMS: list = [ torchvision.transforms.ToTensor(), torchvision.transforms.Resize(size=(IMG_SIZE, IMG_SIZE)) ]
 
-optimizerSGD = torch.optim.SGD(SegmModel.parameters(), lr=LR_RATE, momentum=MOMENTUM)
-criterion = torch.nn.BCEWithLogitsLoss().cuda() if USE_CUDA_ON else torch.nn.BCEWithLogitsLoss()
+#optimizerSGD = torch.optim.SGD(SegmModel.parameters(), lr=LR_RATE, momentum=MOMENTUM)
+optimizerSGD = torch.optim.Adam(SegmModel.parameters())
+#criterion = torch.nn.BCEWithLogitsLoss().cuda() if USE_CUDA_ON else torch.nn.BCEWithLogitsLoss()
+criterion = torch.nn.SmoothL1Loss().cuda() if USE_CUDA_ON else torch.nn.SmoothL1Loss()
 scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizerSGD, milestones=MILSESTONES, gamma=GAMMA)
 
 #   DATALOADER
