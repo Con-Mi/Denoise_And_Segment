@@ -20,7 +20,7 @@ if USE_CUDA_ON:
     DEVICE = torch.device("cuda")
 else:
     DEVICE = torch.device("cpu")
-BATCH_SZ: int = 2
+BATCH_SZ: int = 12
 NR_EPOCHS: int = 20
 MOMENTUM: float = 0.95
 LR_RATE: float = 0.03

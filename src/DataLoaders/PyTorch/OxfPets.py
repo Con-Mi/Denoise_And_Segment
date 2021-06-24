@@ -39,6 +39,7 @@ class PetsData(Dataset):
                 inpt_img = sk_color.rgba2rgb(inpt_img)
             inpt_noisy_img = sk_util.random_noise(inpt_img)
             target_img = sk_io.imread(outpt_img_str)
+            target_img -= target_img
         else:
             inpt_img = sk_color.gray2rgb(inpt_img)
             inpt_noisy_img = sk_util.random_noise(inpt_img)
@@ -83,6 +84,7 @@ class PetsDataValid(Dataset):
             inpt_img = sk_color.rgba2rgb(inpt_img)
         inpt_noisy_img = sk_util.random_noise(inpt_img)
         target_img = sk_io.imread(outpt_img_str)
+        target_img -= target_img
 
         if self._transform is not None:
             inpt_img = self._transform(inpt_img)
