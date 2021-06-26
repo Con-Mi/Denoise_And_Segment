@@ -14,3 +14,7 @@ class DenoiseSegmModel(torch.nn.Module):
         segm_out = self._SegmNet(denoise_out)
 
         return denoise_out, segm_out
+
+
+def DenseLinkModel():
+    return DenseSegmModel()
