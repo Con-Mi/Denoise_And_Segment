@@ -82,7 +82,7 @@ class DenseSegmModel(nn.Module):
 
 class DenoiseSegmModel(torch.nn.Module):
     def __init__(self):
-        super(DenoiseSegmModel).__init__()
+        super(DenoiseSegmModel, self).__init__()
 
         self._DenoiseNet = DenseSegmModel(input_channels=3, num_filters=32, num_classes=3, pretrained=True)
         self._SegmNet = DenseSegmModel(input_channels=3, num_filters=32, num_classes=3, pretrained=True)
