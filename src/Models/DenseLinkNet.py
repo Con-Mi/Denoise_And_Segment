@@ -81,20 +81,20 @@ class DenseSegmModel(nn.Module):
 
 
 class DenoiseSegmModel(nn.Module):
-    def __init__(self, denoise_input_chnls: int=3, segm_outpt_chnls: int=3, denoise_outpt_chnls: int=1):
+    def __init__(self, denoise_input_chnls: int=3, segm_outpt_chnls: int=1, denoise_outpt_chnls: int=3):
         super(DenoiseSegmModel, self).__init__()
 
         self._DenoiseNet = DenseSegmModel(input_channels=denoise_input_chnls, num_filters=32, num_classes=denoise_outpt_chnls, pretrained=True)
         self._SegmNet = DenseSegmModel(input_channels=denoise_outpt_chnls, num_filters=32, num_classes=segm_outpt_chnls, pretrained=True)
 
-    def forward(self, input):
-        denoise_out = self._DenoiseNet(input)
+    def forward(self, x):
+        denoise_out = self._DenoiseNet(x)
         segm_out = self._SegmNet(denoise_out)
 
         return denoise_out, segm_out
 
 
-def DenseDenoisSegmentModel(DenoiseInptChnls: int=3, SegmOutptChnls: int=3, DenoiseOutptChnls: int=1):
+def DenseDenoisSegmentModel(DenoiseInptChnls: int=3, SegmOutptChnls: int=1, DenoiseOutptChnls: int=3):
     return DenoiseSegmModel( denoise_input_chnls=DenoiseInptChnls, segm_outpt_chnls=SegmOutptChnls, denoise_outpt_chnls=DenoiseOutptChnls )
 
 
