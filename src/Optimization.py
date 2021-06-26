@@ -6,6 +6,7 @@ import torch
 import torchvision
 
 from Models.DenseLinkNet import DenseLinkModel
+from Models.DenseLinkNet import DenseDenoisSegmentModel
 from Utils.Functions.ScoringFunctions import jaccard_score, dice_score
 from DataLoaders.PyTorch.OxfPets import PetsDataLoader, PetsValidationDataLoader
 
@@ -20,7 +21,7 @@ if USE_CUDA_ON:
     DEVICE = torch.device("cuda")
 else:
     DEVICE = torch.device("cpu")
-BATCH_SZ: int = 12
+BATCH_SZ: int = 2
 NR_EPOCHS: int = 20
 MOMENTUM: float = 0.95
 LR_RATE: float = 0.03
@@ -29,7 +30,8 @@ IMG_SIZE: int = 384
 GAMMA: float = 0.5
 
 #   Model
-SegmModel = DenseLinkModel(input_channels=3, pretrained=True)
+#SegmModel = DenseLinkModel(input_channels=3, pretrained=True)
+SegmModel = DenseDenoisSegmentModel()
 SegmModel.to(device=DEVICE)
 
 
@@ -68,20 +70,24 @@ def train_model(cust_model, dataloaders, criterion, optimizer, num_epochs, sched
 
             for input_img, noisy_input_img, labels,  in tqdm(dataloaders[phase], total=len(dataloaders[phase])):
                 input_img = input_img.to(device=DEVICE, dtype=torch.float)
+                noisy_input_img = noisy_input_img.to(device=DEVICE, dtype=torch.float)
                 labels = labels.to(device=DEVICE, dtype=torch.float)
 
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(phase == "train"):
-                    out = cust_model(input_img)
-                    preds = torch.sigmoid(out)
-                    loss = criterion(preds, labels)
+                    denoise_pred, segm_pred = cust_model(noisy_input_img)
+                    #preds = torch.sigmoid(out)
+                    #loss = criterion(preds, labels)
+                    loss1 = criterion(denoise_pred, input_img)
+                    loss2 = criterion(segm_pred, labels)
+                    loss = loss1 + loss2
 
                     if phase == "train":
                         loss.backward()
                         optimizer.step()
                 running_loss += loss.item() * input_img.size(0)
-                jaccard_acc += jaccard_score(labels, preds)
+                jaccard_acc += jaccard_score(labels, segm_pred)
                 # dice_acc += dice(labels, preds)
 
             epoch_loss = running_loss / len(dataloaders[phase])

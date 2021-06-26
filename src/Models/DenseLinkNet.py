@@ -80,12 +80,12 @@ class DenseSegmModel(nn.Module):
         return self.final(dec0)
 
 
-class DenoiseSegmModel(torch.nn.Module):
-    def __init__(self):
+class DenoiseSegmModel(nn.Module):
+    def __init__(self, denoise_input_chnls: int=3, segm_outpt_chnls: int=3, denoise_outpt_chnls: int=1):
         super(DenoiseSegmModel, self).__init__()
 
-        self._DenoiseNet = DenseSegmModel(input_channels=3, num_filters=32, num_classes=3, pretrained=True)
-        self._SegmNet = DenseSegmModel(input_channels=3, num_filters=32, num_classes=3, pretrained=True)
+        self._DenoiseNet = DenseSegmModel(input_channels=denoise_input_chnls, num_filters=32, num_classes=denoise_outpt_chnls, pretrained=True)
+        self._SegmNet = DenseSegmModel(input_channels=denoise_outpt_chnls, num_filters=32, num_classes=segm_outpt_chnls, pretrained=True)
 
     def forward(self, input):
         denoise_out = self._DenoiseNet(input)
@@ -94,8 +94,8 @@ class DenoiseSegmModel(torch.nn.Module):
         return denoise_out, segm_out
 
 
-def DenseDenoisSegmentModel():
-    return DenoiseSegmModel()
+def DenseDenoisSegmentModel(DenoiseInptChnls: int=3, SegmOutptChnls: int=3, DenoiseOutptChnls: int=1):
+    return DenoiseSegmModel( denoise_input_chnls=DenoiseInptChnls, segm_outpt_chnls=SegmOutptChnls, denoise_outpt_chnls=DenoiseOutptChnls )
 
 
 def DenseLinkModel(input_channels: int, pretrained: bool=False, num_classes: int=1):
