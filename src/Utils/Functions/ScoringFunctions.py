@@ -1,5 +1,4 @@
 import torch
-from sklearn.metrics import jaccard_score as sk_jaccard_score
 
 
 def jaccard_score(y_true, y_pred):
@@ -12,10 +11,6 @@ def jaccard_score(y_true, y_pred):
     intersection = (y_true * y_pred).sum()
     union = y_true.sum() + y_pred.sum() - intersection
     return (intersection + 1e-15) / (union + 1e-15)
-
-
-def scikit_jaccard_score(y_true, y_pred):
-    sk_jaccard_score(y_true=y_true, y_pred=y_pred)
 
 
 def dice_score(y_true, y_pred):
