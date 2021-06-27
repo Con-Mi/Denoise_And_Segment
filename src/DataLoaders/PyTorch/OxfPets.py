@@ -4,7 +4,6 @@ import torchvision
 from skimage import io as sk_io
 from skimage import color as sk_color
 from skimage import util as sk_util
-from typing import Optional
 
 
 class PetsData(Dataset):
