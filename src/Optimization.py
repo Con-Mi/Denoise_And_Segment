@@ -87,8 +87,9 @@ def train_model(cust_model, dataloaders, criterion, optimizer, num_epochs, sched
                         loss.backward()
                         optimizer.step()
                 running_loss += loss.item() * input_img.size(0)
-                jaccard_acc += jaccard_score(labels, segm_pred)
+                # jaccard_acc += jaccard_score(labels, segm_pred)
                 # dice_acc += dice(labels, preds)
+
 
             epoch_loss = running_loss / len(dataloaders[phase])
             aver_jaccard = jaccard_acc / len(dataloaders[phase])

@@ -43,7 +43,7 @@ def mse_score(y_true, y_pred):
     return torch.mean(torch.pow( input=(y_true-y_pred), exponent=2 ))
 
 
-def psnr(y_true, y_hat):
+def psnr_score(y_true, y_hat):
     r"""
 
     :param y_true:
