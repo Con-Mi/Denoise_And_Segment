@@ -1,5 +1,6 @@
 from torch.utils.data import Dataset, DataLoader
 from pathlib import Path
+import random
 import torchvision
 from skimage import io as sk_io
 from skimage import color as sk_color
@@ -7,14 +8,13 @@ from skimage import util as sk_util
 
 
 class PetsData(Dataset):
-    def __init__(self, transform=None):
+    def __init__(self, input_imgs: list, target_imgs: list, transform=None):
         r"""
         @brief              Constructor
         :param transform:
         """
-        self._data_root: Path = Path("data")
-        self._input_img: list = sorted(self._data_root.glob("**/*.jpg"))
-        self._target_img: list = sorted(self._data_root.glob("**/*.png"))
+        self._input_img: list = input_imgs
+        self._target_img: list = target_imgs
         self._transform = transform
 
     def __len__(self):
@@ -53,14 +53,13 @@ class PetsData(Dataset):
 
 
 class PetsDataValid(Dataset):
-    def __init__(self, transform=None):
+    def __init__(self, input_imgs: list, target_imgs: list, transform=None):
         r"""
         @brief              Constructor
         :param transform:
         """
-        self._data_root: Path = Path("data")
-        self._input_img: list = sorted(self._data_root.glob("**/*.jpg"))[:100]
-        self._target_img: list = sorted(self._data_root.glob("**/*.png"))[:100]
+        self._input_img: list = input_imgs
+        self._target_img: list = target_imgs
         self._transform = transform
 
     def __len__(self):
@@ -93,20 +92,54 @@ class PetsDataValid(Dataset):
         return inpt_img, inpt_noisy_img, target_img
 
 
+def train_validation_split(train_split_percentage: float=0.8):
+    r"""
+
+    :param train_split_percentage:
+    :return:
+    """
+    dataRoot = Path("data")
+    inputFiles: list = sorted(dataRoot.glob("**/*.jpg"))
+    targetFiles: list = sorted(dataRoot.glob("**/*.png"))
+
+    totalNrOfFiles: int = len(inputFiles)
+    trainSize: float = train_split_percentage
+    validSize: float = 1.0 - trainSize
+
+    totalNrOfTrainD: int = round(totalNrOfFiles * trainSize)
+    totalNrOfValidD: int = round(totalNrOfFiles * validSize)
+
+    sampledValidIndxs: list = random.sample(range(len(inputFiles)), totalNrOfValidD)
+    validInput: list = [inputFiles[x] for x in sampledValidIndxs]
+    validTarget: list = [targetFiles[x] for x in sampledValidIndxs]
+
+    trainInput: list = [inputFiles[x] for x in range(len(inputFiles)) if x not in sampledValidIndxs]
+    trainTarget: list = [targetFiles[x] for x in range(len(inputFiles)) if x not in sampledValidIndxs]
+
+    print("Length of Validation Input: ", len(validInput))
+    print("Length of Validation Target: ", len(validTarget))
+    print("Length of Training Input: ", len(trainInput))
+    print("Length of Training Target: ", len(trainTarget))
+
+    return trainInput, trainTarget, validInput, validTarget
+
+
 def PetsDataLoader(data_transform, BatchSz: int=2, worker_threads: int=2, shuffleOn: bool=True):
+    trainInputFiles, trainTargetFiles, _, _ = train_validation_split()
     if data_transform is None:
         data_transform = torchvision.transforms.ToTensor()
-    ds = PetsData(transform=data_transform)
+    ds = PetsData(input_imgs=trainInputFiles, target_imgs=trainTargetFiles, transform=data_transform)
 
     pets_dataloader = DataLoader(ds, batch_size=BatchSz, num_workers=worker_threads, shuffle=shuffleOn)
     return pets_dataloader
 
 
 def PetsValidationDataLoader(data_transform, BatchSz: int=2, worker_threads: int=2, shuffleOn: bool=True):
+    _, _, validInputFiles, validTargetFiles = train_validation_split()
     if data_transform is None:
         data_transform = torchvision.transforms.ToTensor()
 
-    ds = PetsDataValid(transform=data_transform)
+    ds = PetsDataValid(input_imgs=validInputFiles, target_imgs=validTargetFiles, transform=data_transform)
 
     pets_dataloader = DataLoader(ds, batch_size=BatchSz, num_workers=worker_threads, shuffle=shuffleOn)
     return pets_dataloader
