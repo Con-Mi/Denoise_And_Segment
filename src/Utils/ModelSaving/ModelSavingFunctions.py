@@ -8,7 +8,7 @@ def save_model(cust_model, name: str="dense_segm.pt"):
     :param name:
     :return:
     """
-    return torch.save(cust_model.module.state_dict(), name)
+    return torch.save(cust_model.state_dict(), name)
 
 
 def load_model(cust_model, model_dir: str="dense_segm.pt", map_location_device: str="cpu"):
