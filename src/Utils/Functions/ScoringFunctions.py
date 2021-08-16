@@ -1,4 +1,6 @@
+import numpy as np
 import torch
+from sklearn.metrics import jaccard_score as sk_jaccard_score
 
 
 def jaccard_score(y_true, y_pred):
@@ -8,10 +10,23 @@ def jaccard_score(y_true, y_pred):
     :param y_pred:
     :return:
     """
-    intersection = (y_true * y_pred).sum()
-    union = y_true.sum() + y_pred.sum() - intersection
-    return (intersection + 1e-15) / (union + 1e-15)
+    inputs = y_pred.view(-1)
+    targets = y_true.view(-1)
+    intersection = (targets * inputs).sum()
+    total = (inputs + targets).sum()
+    union = total - intersection
+    IoU = (intersection + 1) / (union + 1)
 
+    return IoU
+
+def jaccard_sklearn_score(y_true: np.ndarray, y_pred: np.ndarray):
+    r"""
+
+    :param y_true:
+    :param y_pred:
+    :return:
+    """
+    return sk_jaccard_score(y_true, y_pred)
 
 def dice_score(y_true, y_pred):
     r"""
@@ -20,7 +35,13 @@ def dice_score(y_true, y_pred):
     :param y_pred:
     :return:
     """
-    return (2 * (y_true * y_pred).sum() + 1e-15) / (y_true.sum() + y_pred.sum() + 1e-15)
+    #return (2.0 * (y_true * y_pred).sum() + 1e-15) / (y_true.sum() + y_pred.sum() + 1e-15)
+    inputs = y_pred.view(-1)
+    targets = y_true.view(-1)
+
+    intersection = (inputs*targets).sum()
+    dice = ( 2.0*intersection + 1.0 ) / (inputs.sum() + targets.sum() + 1.0)
+    return dice
 
 
 def mae_score(y_true, y_pred):
